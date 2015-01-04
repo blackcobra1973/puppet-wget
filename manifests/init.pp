@@ -8,11 +8,11 @@ class wget (
   $version = present,
 ) {
 
-  if $::kernel == 'Linux' {
-    if ! defined(Package['wget']) {
-      package { 'wget': ensure => $version }
-    }
-  }
+#  if $::kernel == 'Linux' {
+#    if ! defined(Package['wget']) {
+#      package { 'wget': ensure => $version }
+#    }
+#  }
 
   if $::kernel == 'FreeBSD' {
     if ! defined(Package['ftp/wget']) {
