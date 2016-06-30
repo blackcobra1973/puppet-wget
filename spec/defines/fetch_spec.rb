@@ -39,7 +39,7 @@ describe 'wget::fetch' do
     context "with default params" do
       it { should contain_exec('wget-test').with({
         'command'     => "wget --no-verbose --user=myuser --output-document=\"#{destination}\" \"http://localhost/source\"",
-        'environment' => "WGETRC=#{destination}.wgetrc"
+        'environment' => ["WGETRC=#{destination}.wgetrc"]
         })
       }
       it { should contain_file("#{destination}.wgetrc").with_content('password=mypassword') }
@@ -53,7 +53,7 @@ describe 'wget::fetch' do
       it { should contain_exec('wget-test').with({
         'command' => "wget --no-verbose --user=myuser --output-document=\"#{destination}\" \"http://localhost/source\"",
         'user' => 'testuser',
-        'environment' => "WGETRC=#{destination}.wgetrc"
+        'environment' => ["WGETRC=#{destination}.wgetrc"]
       }) }
     end
 
@@ -156,4 +156,27 @@ describe 'wget::fetch' do
       'unless'  => "echo 'd41d8cd98f00b204e9800998ecf8427e  #{destination}' | md5sum -c --quiet",
     })}
   end
+
+  context "download to dir", :compile do
+    let(:params) { super().merge({
+      :destination => '/tmp/dest/',
+    })}
+  
+    it { should contain_exec('wget-test').with({
+      'command' => "wget --no-verbose --output-document=\"#{destination}//source\" \"http://localhost/source\"",
+      'environment' => []
+    }) }
+  end
+
+  context "with unless", :compile do
+    let(:params) { super().merge({
+      :unless => "test $(ls -A #{destination} | head -1 2>/dev/null)",
+    })}
+
+    it { should contain_exec('wget-test').with({
+      'command' => "wget --no-verbose --output-document=\"#{destination}\" \"http://localhost/source\"",
+      'unless'  => "test $(ls -A #{destination} | head -1 2>/dev/null)",
+    })}
+  end
+
 end
